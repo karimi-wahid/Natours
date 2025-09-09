@@ -1,5 +1,6 @@
 import Tour from './../models/tourModel.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import catchAsync from '../utils/catchAsync.js';
 
 const aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -8,8 +9,7 @@ const aliasTopTours = (req, res, next) => {
   next();
 };
 
-const getTours = async (req, res) => {
-  try {
+const getTours = catchAsync(async (req, res) => {
     // BUILD QUERY
     // 1A) Filtering
     // const queryObj = {...req.query};
@@ -66,13 +66,8 @@ const getTours = async (req, res) => {
         tours,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  
+});
 
 const getTour = async (req, res) => {
   const { id } = req.params;
@@ -93,26 +88,21 @@ const getTour = async (req, res) => {
   }
 };
 
-const createTour = async (req, res) => {
-  try {
-    const newTour = await Tour.create(req.body);
+
+
+const createTour = catchAsync(async (req, res) => {
+  
+  const newTour = await Tour.create(req.body);
     res.status(201).json({
       status: 'success',
       data: {
         tour: newTour,
       },
     });
-  } catch (error) {
-    res.json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+});
 
-const updateTour = async (req, res) => {
+const updateTour = catchAsync(async (req, res) => {
   const { id } = req.params;
-  try {
     const tour = await Tour.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
@@ -123,16 +113,9 @@ const updateTour = async (req, res) => {
         tour,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+});
 
-const deleteTour = async (req, res) => {
-  try {
+const deleteTour = catchAsync(async (req, res) => {
     await Tour.findByIdAndDelete(req.params.id);
 
     res.status(204).json({
@@ -141,16 +124,10 @@ const deleteTour = async (req, res) => {
         tour: null,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+  
+});
 
-const getTourStats = async (req, res) => {
-  try {
+const getTourStats = catchAsync(async (req, res) => {
     const stats = await Tour.aggregate([
       {
         $match: { ratingAverage: { $gte: 4.5 } },
@@ -180,16 +157,9 @@ const getTourStats = async (req, res) => {
         tour: stats,
       },
     });
-  } catch (error) {
-    res.status(404).json({
-      status: 'fail',
-      message: error,
-    });
-  }
-};
+});
 
-const getMonthlyPlan = async (req, res) => {
-  try {
+const getMonthlyPlan = catchAsync(async (req, res) => {
     const year = (req.params.year = 1);
 
     const plan = await Tour.aggregate([
@@ -233,8 +203,7 @@ const getMonthlyPlan = async (req, res) => {
         tour: plan,
       },
     });
-  } catch (error) {}
-};
+});
 
 export const tourControllers = {
   getTours,
