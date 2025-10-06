@@ -1,6 +1,6 @@
 import express from 'express';
 import { tourControllers } from '../controllers/tourController.js';
-
+import { authControllers } from '../controllers/authController.js';
 const router = express.Router();
 
 // router.param('id', tourControllers.checkId);
@@ -14,13 +14,13 @@ router.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan);
 
 router
   .route('/')
-  .get(tourControllers.getTours)
+  .get(authControllers.protect, tourControllers.getTours)
   .post(tourControllers.createTour);
 
 router
   .route('/:id')
   .get(tourControllers.getTour)
   .patch(tourControllers.updateTour)
-  .delete(tourControllers.deleteTour);
+  .delete(authControllers.protect, authControllers.restrictTo('admin', 'lead-guide'), tourControllers.deleteTour);
 
 export default router;
