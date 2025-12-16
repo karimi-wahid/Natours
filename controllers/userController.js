@@ -1,3 +1,6 @@
+import User from "../models/userModel";
+import AppError from "../utils/appError";
+
 const getAllUser = (req, res) => {
   res.status(500).json({
     status: 'error',
@@ -33,10 +36,25 @@ const deleteUser = (req, res) => {
   });
 };
 
+const updateMe = catchAsync(async (req, res, next) => {
+    // 1) Create error if user POSTs password data
+    if (req.body.password || req.body.passwordConfirm) {
+        return next(new AppError('This route is not for password updates. Please use /updateMyPassword.', 400));
+    }
+    // 2) Update user document
+    const user = await User.findByIdAndUpdate(req.user._id, x, {new: true, runValidators: true});
+    user.name= 'nadim'
+    res.status(200).json({
+      status: 'success',
+
+    })
+})
+
 export const userControllers = {
   getAllUser,
   getUser,
   updateUser,
   createUser,
   deleteUser,
+  updateMe
 };
